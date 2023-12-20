@@ -1,0 +1,36 @@
+{
+ "name": "bms_snqs_api",
+ "version": "1.0.0",
+ "description": "",
+ "main": "index.js",
+ "scripts": {
+  "test": "echo \"Error: no test specified\" && exit 1",
+  "start": "nodemon index.js"
+ },
+ "author": "",
+ "license": "ISC",
+ "dependencies": {
+  "amount-to-words": "^1.1.0",
+  "assert": "^2.0.0",
+  "body-parser": "^1.19.1",
+  "cors": "^2.8.5",
+  "dotenv": "^10.0.0",
+  "ejs": "^3.1.9",
+  "express": "^4.17.2",
+  "fs": "0.0.1-security",
+  "fs-extra": "^10.0.0",
+  "html-pdf": "^3.0.1",
+  "jsonwebtoken": "^9.0.1",
+  "moment": "^2.29.4",
+  "moment-timezone": "^0.5.43",
+  "mssql": "^7.3.0",
+  "multer": "^1.4.5-lts.1",
+  "node-fetch": "^2.0.0",
+  "nodemon": "^2.0.15",
+  "numeral": "^2.0.6",
+  "path": "^0.12.7",
+  "pdfkit": "^0.13.0",
+  "puppeteer": "^2.1.1",
+  "to-words": "^3.6.1"
+ }
+}
