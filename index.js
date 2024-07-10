@@ -1,7 +1,6 @@
-const express = require('express');
-const mysql = require('mysql2');
-const cors = require('cors');
-
+const express = require("express");
+const mysql = require("mysql");
+const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 8081;
 
@@ -9,121 +8,105 @@ app.use(cors());
 app.use(express.json());
 
 const db = mysql.createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'crud'
+    host: "localhost",
+    user: "root",
+    password: "",
+    database: "crud"
 });
 
 db.connect((err) => {
     if (err) {
-        console.error('Error connecting to MySQL:', err);
+        console.error('Error connecting to the database:', err);
         return;
     }
-    console.log("Connected to MySQL database");
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-// Get all products
-app.get('/data', (req, res) => {
-    db.query('SELECT * FROM data', (err, results) => {
-        if (err) throw err;
-        res.json(results);
-    });
+    console.log('Connected to the database.');
 });
 
 app.get('/users', (req, res) => {
-  db.query('SELECT * FROM users', (err, results) => {
-      if (err) throw err;
-      res.json(results);
-  });
-});
-
-// Get product by id
-app.get('/data/:id', (req, res) => {
-    const sql = 'SELECT * FROM data WHERE id = ?';
-    const id = req.params.id;
-
-    db.query(sql, [id], (err, results) => {
-        if (err) {
-            console.error("Database query error: ", err);
-            return res.status(500).json({ error: "Database query error", details: err });
-        }
-        if (results.length === 0) {
-            return res.status(404).json({ message: "No record found with this ID" });
-        }
-        return res.json(results[0]);
+    const sql = "SELECT * FROM users";
+    db.query(sql, (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
     });
 });
 
-app.get('/users/:id', (req, res) => {
-  const sql = 'SELECT * FROM users WHERE id = ?';
-  const id = req.params.id;
-
-  db.query(sql, [id], (err, results) => {
-      if (err) {
-          console.error("Database query error: ", err);
-          return res.status(500).json({ error: "Database query error", details: err });
-      }
-      if (results.length === 0) {
-          return res.status(404).json({ message: "No record found with this ID" });
-      }
-      return res.json(results[0]);
-  });
+app.get('/uom', (req, res) => {
+    const sql = "SELECT * FROM uom";
+    db.query(sql, (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    });
 });
 
-app.post('/add', (req, res) => {
-    const sql = "INSERT INTO `data` (`id`, `account_no`, `account_name`, `ifsc_code`, `phone`, `email`, `branch`, `city`, `address`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-    const values = [
-        req.body.id,
-        req.body.account_no,
-        req.body.account_name,
-        req.body.ifsc_code,
-        req.body.phone,
-        req.body.email,
-        req.body.branch,
-        req.body.city,
-        req.body.address,
-    ];
+app.post('/create', (req, res) => {
+    const { id, company_name, Address, phone } = req.body;
+    if (!id || !company_name || !Address || !phone) {
+        return res.status(400).json({ error: 'Please fill in all fields' });
+    }
+    const sql = "INSERT INTO users (`id`, `company_name`, `Address`, `phone`) VALUES (?,?,?,?)";
+    const values = [id, company_name, Address, phone];
+    db.query(sql, values, (err, data) => {
+        if (err) return res.json(err);
+        return res.json("created");
+    });
+});
 
-    db.query(sql, values, (err, results) => {
-        if (err) {
-            console.error("Database insert error: ", err); // Log the detailed error
-            return res.status(500).json({ error: "Database insert error", details: err });
-        }
-        return res.json({ message: "Created", results });
+app.post('/create1', (req, res) => {
+    const { id, product_description, primary, secondary, price } = req.body;
+    if (!id || !product_description || !primary || !secondary || !price) {
+        return res.status(400).json({ error: 'Please fill in all fields' });
+    }
+    const sql = "INSERT INTO uom (`id`, `product_description`, `primary`, `secondary`, `price`) VALUES (?,?,?,?,?)";
+    const values = [id, product_description, primary, secondary, price];
+    db.query(sql, values, (err, data) => {
+        if (err) return res.json(err);
+        return res.json("created");
+    });
+});
+
+app.delete('/delete/:id', (req, res) => {
+    const sql = "DELETE FROM users WHERE id = ?";
+    const id = req.params.id;
+    db.query(sql, [id], (err, data) => {
+        if (err) return res.json(err);
+        return res.json("deleted");
+    });
+});
+
+app.delete('/delete/:id', (req, res) => {
+    const sql = "DELETE FROM uom WHERE id = ?";
+    const id = req.params.id;
+    db.query(sql, [id], (err, data) => {
+        if (err) return res.json(err);
+        return res.json("deleted");
     });
 });
 
 
 app.put('/update/:id', (req, res) => {
-    const sql = "UPDATE data SET account_no = ?, account_name = ?, ifsc_code = ?, phone =?, email =?,branch=? ,  city =?, address =? WHERE id = ?";
+    const sql = "UPDATE users SET `id` = ?, `company_name` = ?, `Address` = ?, `phone` = ? WHERE id = ?";
     const id = req.params.id;
-    const values = [
-        req.body.account_no,
-        req.body.account_name,
-        req.body.ifsc_code,
-        req.body.phone,
-        req.body.email,
-        req.body.branch,
-        req.body.city,
-        req.body.address,
-    ]
-    db.query(sql, [...values, id], (err, results) => {
+    const { id: newId, company_name, Address, phone } = req.body;
+    const values = [newId, company_name, Address, phone, id];
+    db.query(sql, values, (err, data) => {
         if (err) return res.json(err);
-        return res.json("Updated");
-    })
+        return res.json("updated");
+    });
 });
 
-app.delete('/delete/:id', (req, res) => {
-    const sql = "DELETE FROM data WHERE id = ?";
+app.put('/update1/:id', (req, res) => {
+    const sql = "UPDATE uom SET `id` = ?, `product_description` = ?, `primary` = ?, `secondary` = ?, `price` = ? WHERE id = ?";
     const id = req.params.id;
-
-    db.query(sql, [id], (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        return res.status(200).json({ message: "Deleted successfully" });
+    const { id: newId, product_description, primary, secondary, price } = req.body;
+    const values = [newId, product_description, primary, secondary, price, id];
+    db.query(sql, values, (err, data) => {
+        if (err) return res.json(err);
+        return res.json("updated");
     });
+});
+
+
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
 });
