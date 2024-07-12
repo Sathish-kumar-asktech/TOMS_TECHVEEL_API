@@ -3,6 +3,7 @@ const mysql = require("mysql");
 const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 8081;
+const PORT = process.env.PORT || 8082;
 
 app.use(cors());
 app.use(express.json());
@@ -29,7 +30,13 @@ app.get('/users', (req, res) => {
         return res.json(data);
     });
 });
-
+app.get('/bank', (req, res) => {
+    const sql = "SELECT * FROM bank";
+    db.query(sql, (err, data) => {
+        if (err) return res.json(err);
+        return res.json(data);
+    });
+});
 app.get('/uom', (req, res) => {
     const sql = "SELECT * FROM uom";
     db.query(sql, (err, data) => {
