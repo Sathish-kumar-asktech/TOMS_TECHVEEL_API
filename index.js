@@ -13,7 +13,7 @@ const db = mysql.createConnection({
     password: "",
     database: "crud"
 });
-
+ 
 db.connect((err) => {
     if (err) {
         console.error('Error connecting to the database:', err);
