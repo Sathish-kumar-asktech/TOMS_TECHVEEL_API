@@ -1,0 +1,1 @@
+delete from  TblUserMst where Userid=@Userid
